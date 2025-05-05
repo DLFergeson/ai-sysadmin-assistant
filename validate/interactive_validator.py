@@ -1,3 +1,5 @@
+from dotenv import load_dotenv; load_dotenv()
+
 """
 Interactive step-by-step validator using NLP and semantic analysis.
 """
@@ -5,6 +7,7 @@ Interactive step-by-step validator using NLP and semantic analysis.
 from nlp.step_extractor import extract_steps
 from nlp.answer_analyzer import is_answer_valid
 from learning.activity_logger import log_activity
+from utils.enhancements import send_telegram_message  # Telegram alert
 
 def validate_steps(content):
     """
@@ -37,4 +40,14 @@ def validate_steps(content):
         })
 
     log_activity("validation_results", results)
+
+    # Telegram notification if too many steps fail
+    failed_steps = [r for r in results if not r["valid"]]
+    if len(failed_steps) > 2:
+        send_telegram_message(
+            chat_id="YOUR_CHAT_ID",
+            message=f"⚠️ Validation failed on {len(failed_steps)} steps for this session.",
+            token="YOUR_TELEGRAM_BOT_TOKEN"
+        )
+
     return results

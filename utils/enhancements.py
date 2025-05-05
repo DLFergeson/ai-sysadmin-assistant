@@ -1,47 +1,38 @@
-import requests
-import subprocess
 import platform
-import unittest
+import subprocess
+import logging
+import os
+from dotenv import load_dotenv
 
-# Robust Error Handling
-def send_telegram_message(chat_id, message, token):
-    try:
-        response = requests.post(
-            f"https://api.telegram.org/bot{token}/sendMessage",
-            data={"chat_id": chat_id, "text": message}
-        )
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to send message: {e}")
+# Load .env variables
+load_dotenv()
 
-def run_command(command):
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+def platform_command():
+    """Return system name (e.g., Windows, Linux)"""
+    return platform.system()
+
+def run_command(cmd):
+    """Execute a shell command safely"""
     try:
-        result = subprocess.run(command, shell=True, check=True, capture_output=True)
-        return result.stdout.decode()
+        result = subprocess.run(cmd, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return result.stdout.decode().strip()
     except subprocess.CalledProcessError as e:
-        print(f"Command failed: {e}")
-        return None
+        logging.error(f"Command failed: {e}")
+        return e.stderr.decode().strip()
 
-# Modularity (Example OS Detection)
-if platform.system() == "Linux":
-    def platform_command():
-        return run_command("ls -l")
-elif platform.system() == "Windows":
-    def platform_command():
-        return run_command("dir")
-else:  # macOS (Darwin)
-    def platform_command():
-        return run_command("ls -l")
-
-# Testing
-class TestRunCommand(unittest.TestCase):
-    def test_run_command_success(self):
-        result = run_command("echo Hello")
-        self.assertEqual(result.strip(), "Hello")
-
-    def test_run_command_failure(self):
-        result = run_command("invalid_command")
-        self.assertIsNone(result)
-
-if __name__ == "__main__":
-    unittest.main()
+def send_telegram_message(chat_id=TELEGRAM_CHAT_ID, message="Test alert", token=TELEGRAM_BOT_TOKEN):
+    """Send a Telegram message using a bot"""
+    if not chat_id or not token:
+        return "Missing token or chat_id"
+    try:
+        import requests
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        data = {"chat_id": chat_id, "text": message}
+        response = requests.post(url, data=data)
+        return response.status_code == 200
+    except Exception as e:
+        logging.error(f"Telegram send error: {e}")
+        return False
