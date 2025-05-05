@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <div class="container mt-4">
+        <h2 class="text-warning">Results for '{{ term }}'</h2>
+        <h4>📄 ITGlue Docs</h4>
+        <ul>
+            {% for doc in docs %}
+            <li>{{ doc }}</li>
+            {% endfor %}
+        </ul>
+        <h4 class="mt-4">🌐 Auvik Device</h4>
+        <pre>{{ device }}</pre>
+    </div>
+</body>
+</html>

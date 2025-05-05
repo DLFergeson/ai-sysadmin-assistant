@@ -1,0 +1,11 @@
+beautifulsoup4
+requests
+PyMuPDF
+python-docx
+tk
+sentence-transformers
+openai
+transformers
+scikit-learn
+nltk
+pandas

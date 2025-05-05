@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+.Python
+env/
+venv/
+ENV/
+venv.bak/
+venv3/
+.idea/
+.vscode/
+*.zip
+data/*.db
